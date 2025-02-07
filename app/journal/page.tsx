@@ -16,11 +16,17 @@ import axios from 'axios';
 import { useToast } from "@/hooks/use-toast";
 import LoadingSpinner from "@/components/loadingSpinner";
 import { formatToLocalDate } from "@/lib/utils";
+import { PredictMoodDialog } from "@/components/predictMoodDialog";
 
 const JournalPage = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [isFetching, setIsFetching] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [moodScore, setmoodScore] = useState<number>(0);
+    const onClose = () => {
+        setIsOpen(false);
+    };
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof journalSchema>>({
@@ -102,6 +108,36 @@ const JournalPage = () => {
         }
     };
 
+    // Auto-save API call
+    const handleAutoSave = async (data: z.infer<typeof journalSchema>) => {
+        try {
+            await axios.post('/api/journal', data);
+        } catch (error) {
+            console.error("Auto-save error:", error);
+        }
+    };
+
+    // Show predict mood dialog
+    const handlePredictMood = async () => {
+        setIsOpen(true);
+        try {
+            console.log(">>sending content", form.getValues("content"))
+            const res = await axios.post('/api/journal/analyze-content', {
+                'content': form.getValues("content")
+            });
+            
+            if (res.status === 200) {
+                console.log(res?.data)
+                setmoodScore(res?.data.content.sentiment_score)
+            }
+        } catch (error) {
+            console.log("Journal analysis error: ", error);
+        }
+
+    }
+
+    console.log("Selected Date: ", selectedDate);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full max-w-7xl p-4 lg:p-6">
 
@@ -145,6 +181,11 @@ const JournalPage = () => {
                                     </FormItem>
                                 )} />
                                 <div className="flex justify-end">
+                                    {
+                                        form.getValues("content").trim() !== "" && !isFetching ?
+                                            <Button size='lg' className="bg-yellow-500 hover:bg-yellow-400 mr-8" onClick={handlePredictMood}>Check my mood💡</Button>
+                                            : null
+                                    }
                                     <Button
                                         type="submit"
                                         className="self-end"
@@ -157,6 +198,12 @@ const JournalPage = () => {
                         </Form>
                     </CardContent>
                 </Card>
+
+                {isOpen ? <PredictMoodDialog
+                    isOpen={isOpen}
+                    moodScore={moodScore}
+                    onClose={onClose}
+                /> : null}
             </motion.div>
         </div>
     );

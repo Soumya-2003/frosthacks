@@ -48,6 +48,14 @@ enum AssessmentOptions {
     SentenceFormation = "SentenceFormation"
 }
 
+enum SentimentCategory {
+    VERY_NEGATIVE,
+    NEGATIVE,
+    NEUTRAL,
+    POSITIVE,
+    VERY_POSITIVE,
+  }
+
 export { 
     APP_NAME,
     SUPPORT_EMAIL,
@@ -56,5 +64,6 @@ export {
     getRandomElement,
     SocialMedia,
     Routes,
-    AssessmentOptions
+    AssessmentOptions,
+    SentimentCategory
 }
