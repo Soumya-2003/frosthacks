@@ -8,8 +8,6 @@ export interface User extends Document {
     role: 'user' | 'admin',
     age?: number,
     gender?: 'male' | 'female' | 'other',
-    verifyCode: string,
-    isVerified: boolean,
     profilePicture?: string,
     verificationToken: string,
     passwordResetToken?: string,
@@ -24,8 +22,6 @@ const userSchema: Schema<User> = new Schema({
     role: { type: String, enum: ["user", "admin"], default: "user" },
     age: { type: Number, min: 13 }, // Assuming a minimum age requirement
     gender: { type: String, enum: ["male", "female", "other"] },
-    verifyCode: { type: String, required: false },
-    isVerified: { type: Boolean, default: false },
     verificationToken: { type: String }, // Token for email verification
     passwordResetToken: { type: String },
     passwordResetExpiryTime: { type: Date },

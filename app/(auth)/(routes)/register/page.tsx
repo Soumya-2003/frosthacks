@@ -51,7 +51,7 @@ const RegisterForm = () => {
                 })
             }
 
-            router.push('/verify')
+            router.push('/login')
 
         } catch (error) {
             toast({

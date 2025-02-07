@@ -49,18 +49,6 @@ export async function POST(request: NextRequest) {
     //   if (uploadedImageUrl) profilePictureUrl = uploadedImageUrl;
     // }
 
-    // Generate a 6-digit verification code
-    const verifyCode = generateVerifyCode();
-    const emailResponse = await sendVerificationEmail(email, username, verifyCode);
-    const emailResult = await emailResponse.json();
-
-    if (!emailResult.success) {
-      return NextResponse.json(
-        { message: 'Failed to send verification email' },
-        { status: 500 }
-      );
-    }
-
     // Create a new user
     const newUser = new UserModel({
       username,
@@ -69,9 +57,6 @@ export async function POST(request: NextRequest) {
       role: "user",
       age,
       gender,
-      isVerified: false,
-      verificationToken: generateVerificationToken(), // Generate a verification token
-      verifyCode: generateVerifyCode(), 
       profilePicture: "",
     });
 
@@ -92,7 +77,6 @@ export async function POST(request: NextRequest) {
           age: newUser.age,
           gender: newUser.gender,
           profilePicture: newUser.profilePicture,
-          isVerified: newUser.isVerified
         },
         token,
       },
