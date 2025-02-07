@@ -9,10 +9,10 @@ export async function POST(request: NextRequest) {
   await dbConnect();
 
   try {
-    
+
     const sesssion = await getServerSession(authOptions)
 
-    if(!sesssion){
+    if (!sesssion) {
       return NextResponse.json(
         {
           message: "Unauthorized request!!",
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     const { content, date } = await request.json();
 
-    if(!date){
+    if (!date) {
       return NextResponse.json(
         {
           message: "Date is missing."
@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingUser = await UserModel.findOne({email: sesssion.user.email})
+    const existingUser = await UserModel.findOne({ email: sesssion.user.email })
 
-    if(!existingUser){
+    if (!existingUser) {
       return NextResponse.json(
         {
           message: "User not found!!",
@@ -56,22 +56,47 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const userID = existingUser._id
+    const userID = existingUser._id;
 
-    // Create a new journal entry
-    const newJournal = new JournalModel({
-      userID,
-      date,
-      content,
-    });
+    const gotDate = new Date(date);
 
-    await newJournal.save();
+    const startOfTheDay = gotDate.setHours(0, 0, 0, 0);
 
-    // Return success response
+    const endOfTheDay = gotDate.setHours(23, 59, 59, 999);
+
+    const existingJournal = await JournalModel.findOne({
+      date: {
+        $gte: startOfTheDay,
+        $lte: endOfTheDay
+      }
+    })
+
+    if (!existingJournal) {
+      // Create a new journal entry
+      const newJournal = new JournalModel({
+        userID,
+        date,
+        content,
+      });
+
+      await newJournal.save();
+
+      // Return success response
+      return NextResponse.json(
+        { message: 'Journal entry saved successfully' },
+        { status: 201 }
+      );
+    }
+
+    existingJournal.content = content;
+
+    await existingJournal.save();
+
     return NextResponse.json(
       { message: 'Journal entry saved successfully' },
-      { status: 201 }
+      { status: 200 }
     );
+
   } catch (error) {
     console.error('Journal save error:', error);
     return NextResponse.json(

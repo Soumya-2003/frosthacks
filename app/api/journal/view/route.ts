@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     if (!journalEntry) {
       return NextResponse.json(
         { message: 'No journal entry found for the specified date.' },
-        { status: 404 }
+        { status: 200 }
       );
     }
 

@@ -16,8 +16,6 @@ const DashboardPage = () => {
 
     const { data: session } = useSession();
 
-    console.log("User data: ", session?.user)
-
     const user = session?.user
 
     const getGreeting = () => {

@@ -12,16 +12,12 @@ import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Save } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import axios from 'axios';
 import { useToast } from "@/hooks/use-toast";
-import { formatToLocalDate } from "@/lib/utils";
 
 const JournalPage = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(true);
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof journalSchema>>({
@@ -36,10 +32,10 @@ const JournalPage = () => {
     useEffect(() => {
         const fetchJournalEntry = async () => {
             try {
-                const res = await axios.get(`/api/journal?date=${selectedDate}`);
+                const res = await axios.get(`/api/journal/view?date=${selectedDate}`);
 
-                if (res.status === 200 && res.data.journal) {
-                    form.setValue("content", res.data.journal.content);
+                if (res.status === 200 && res.data.content) {
+                    form.setValue("content", res.data.content);
                 } else {
                     form.setValue("content", "");
                 }
@@ -49,27 +45,30 @@ const JournalPage = () => {
         };
 
         fetchJournalEntry();
-        form.setValue("date", selectedDate);
+        form.setValue("date", selectedDate); // ✅ Manually update date
 
     }, [selectedDate]);
 
     // Auto-save journal every 5 seconds
     useEffect(() => {
-        if (!autoSaveEnabled) return;
-
         const interval = setInterval(() => {
-            if (form.getValues("content")) {
-                handleAutoSave(form.getValues());
+            const content = form.getValues("content");
+            if (content.trim() !== "") {
+                handleAutoSave({ date: selectedDate, content });
             }
         }, 5000);
 
         return () => clearInterval(interval);
-    }, [autoSaveEnabled, form]);
+    }, [selectedDate, form]);
 
     // Save journal manually
-    const handleSave = async (data: z.infer<typeof journalSchema>) => {
+    const handleSave = async () => {
+        console.log("Manual save triggered!"); // ✅ Debugging
         setIsSaving(true);
+
         try {
+            const data = form.getValues(); // ✅ Get values manually
+            console.log("Saving Data:", data); // ✅ Debugging
             const res = await axios.post('/api/journal', data);
 
             if (res.status === 200) {
@@ -99,6 +98,8 @@ const JournalPage = () => {
         }
     };
 
+    console.log("Selected Date: ", selectedDate);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full max-w-7xl p-4 lg:p-6">
 
@@ -124,21 +125,23 @@ const JournalPage = () => {
                 <Card className="w-full lg:h-[413px] h-[300px] shadow-xl dark:shadow-2xl rounded-lg flex flex-col">
                     <CardContent className="flex flex-col p-6">
                         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white text-center">Write your Journal</h2>
-                        <h4 className="text-center pb-2">{formatToLocalDate(selectedDate)}</h4>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(handleSave)} className="flex flex-col flex-grow space-y-4">
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSave();
+                            }} className="flex flex-col flex-grow space-y-4">
                                 <FormField control={form.control} name="content" render={({ field }) => (
                                     <FormItem className="flex-grow">
                                         <Textarea {...field} placeholder="Express your day..."
                                             className="w-full h-60 p-4 text-lg rounded-md border dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300" />
                                     </FormItem>
                                 )} />
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-4">
-                                        <Switch id="autosave" checked={autoSaveEnabled} onCheckedChange={setAutoSaveEnabled} />
-                                        <Label htmlFor="autosave"> Autosave</Label>
-                                    </div>
-                                    <Button className="self-end" size={'lg'}>
+                                <div className="flex justify-end">
+                                    <Button 
+                                        type="submit" 
+                                        className="self-end" 
+                                        size={'lg'} 
+                                        disabled={selectedDate.getDate() !== new Date().getDate()}>
                                         {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
                                     </Button>
                                 </div>
