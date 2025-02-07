@@ -9,31 +9,23 @@ export async function POST(request: NextRequest) {
   await dbConnect();
 
   try {
-
-    const sesssion = await getServerSession(authOptions)
-
-    if (!sesssion) {
+    // Get session
+    const session = await getServerSession(authOptions);
+    if (!session) {
       return NextResponse.json(
-        {
-          message: "Unauthorized request!!",
-        },
-        {
-          status: 401
-        }
-      )
+        { message: "Unauthorized request!!" },
+        { status: 401 }
+      );
     }
 
+    // Extract request body
     const { content, date } = await request.json();
 
     if (!date) {
       return NextResponse.json(
-        {
-          message: "Date is missing."
-        },
-        {
-          status: 400
-        }
-      )
+        { message: "Date is missing." },
+        { status: 400 }
+      );
     }
 
     if (!content) {
@@ -43,57 +35,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingUser = await UserModel.findOne({ email: sesssion.user.email })
-
+    // Find user
+    const existingUser = await UserModel.findOne({ email: session.user.email });
     if (!existingUser) {
       return NextResponse.json(
-        {
-          message: "User not found!!",
-        },
-        {
-          status: 404
-        }
-      )
+        { message: "User not found!!" },
+        { status: 404 }
+      );
     }
 
     const userID = existingUser._id;
 
+    // Convert date to "dd-mm-yyyy" format
     const gotDate = new Date(date);
+    const formattedDate = `${gotDate.getDate().toString().padStart(2, '0')}-${(gotDate.getMonth() + 1).toString().padStart(2, '0')}-${gotDate.getFullYear()}`;
 
-    const startOfTheDay = gotDate.setHours(0, 0, 0, 0);
+    console.log("Backend formatted date: ", formattedDate);
 
-    const endOfTheDay = gotDate.setHours(23, 59, 59, 999);
-
-    const existingJournal = await JournalModel.findOne({
-      date: {
-        $gte: startOfTheDay,
-        $lte: endOfTheDay
-      }
-    })
+    // Check if a journal entry already exists for that date
+    const existingJournal = await JournalModel.findOne({ date: formattedDate, userID });
 
     if (!existingJournal) {
       // Create a new journal entry
       const newJournal = new JournalModel({
         userID,
-        date,
+        date: formattedDate, // Save formatted date
         content,
       });
 
       await newJournal.save();
 
-      // Return success response
       return NextResponse.json(
         { message: 'Journal entry saved successfully' },
         { status: 201 }
       );
     }
 
+    // Update existing journal entry
     existingJournal.content = content;
-
     await existingJournal.save();
 
     return NextResponse.json(
-      { message: 'Journal entry saved successfully' },
+      { message: 'Journal entry updated successfully' },
       { status: 200 }
     );
 
