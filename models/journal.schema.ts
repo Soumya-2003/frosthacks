@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface Journal extends Document {
-  userID: string; 
-  date: Date;     
-  content: string; 
+  userID: string;   
+  content: string;
+  date: Date;    
 }
 
 const journalSchema: Schema<Journal> = new Schema({
