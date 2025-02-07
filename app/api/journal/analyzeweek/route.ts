@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
       email: session.user.email
     })
 
+    console.log("logged in ", session.user.email);
     if(!existingUser){
       return NextResponse.json(
         {
@@ -64,10 +65,8 @@ export async function POST(request: NextRequest) {
       journalEntries[`Day ${index + 1}`] = journal.content;
     });
 
-    
-
     // Call the Flask API for sentiment analysis
-    const flaskApiUrl = 'http://localhost:5001/analyze';
+    const flaskApiUrl = 'http://localhost:5000/analyze-weekly-data';
     const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries });
     const emotionResults = response.data;
 

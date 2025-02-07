@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import json
 from sentiment_analysis import analyze_sentiment
+from weekly_analysis import weekly_sentiment_analysis
 app = Flask(__name__)
 
 @app.route('/')
@@ -8,7 +9,7 @@ def home():
     return "Welcome to the Sentiment Analysis API! Use the /analyze endpoint to analyze journal entries."
 
 @app.route('/analyze-content', methods=['POST'])
-def analyze():
+def analyze_content():
     
     try:
         # Parse the input JSON
@@ -24,6 +25,31 @@ def analyze():
 
         # Return the results
         return jsonify(sentiment_results), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/analyze-weekly-data', methods=['POST'])
+def analyze_weekly_data():
+    try:
+        # Parse the input JSON
+        data = request.get_json()
+        if not data or 'journal_entries' not in data:
+            return jsonify({'error': 'Invalid input. Expected JSON with "journal_entries" field.'}), 400
+
+        journal_entries = data['journal_entries']  # Dictionary of journal entries (Day 1, Day 2, etc.)
+
+        print("starting")
+        overall_mood, overall_emotions = weekly_sentiment_analysis(journal_entries)
+
+        print(">>Overall Mood: reaching")
+
+        # Prepare the response
+        return jsonify({
+            "overall_emotions": overall_emotions,
+            "overall_mood": overall_mood.upper(),
+            "message": "Emotion analysis completed successfully"
+        }), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
