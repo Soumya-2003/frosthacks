@@ -42,10 +42,6 @@ export const authOptions: NextAuthOptions = {
                         throw new Error("No user found with this credentials.");
                     }
 
-                    if(!user.isVerified){
-                        throw new Error("Please verify your account before login.")
-                    }
-
                     const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
 
                     if(!isPasswordCorrect){
@@ -84,9 +80,7 @@ export const authOptions: NextAuthOptions = {
                         gender: null,
                         age: null,
                         password: "",
-                        verifyCode: "",
                         profilePicture: profile?.image,
-                        isVerified: true,
                         oAuth: true
                     })
 
