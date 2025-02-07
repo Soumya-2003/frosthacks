@@ -1,15 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface Sentiment extends Document {
-  userID: string; // Reference to the user
-  results: object; // Sentiment analysis results
-  createdAt: Date; // Timestamp
+  userID: string;
+  overallEmotions: { [key: string]: number };
+  overallMood: string;
+  date: Date; // Timestamp
 }
 
 const sentimentSchema: Schema<Sentiment> = new Schema({
   userID: { type: String, required: true },
-  results: { type: Object, required: true },
-  createdAt: { type: Date, default: Date.now },
+  overallEmotions: { type: Map, of: Number, required: true },
+  overallMood: { type: String, required: true },
+  date: { type: Date, default: Date.now },
 });
 
 const SentimentModel =
