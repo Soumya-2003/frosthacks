@@ -59,7 +59,9 @@ const Questionaire = () => {
         }));
 
         try {
-            const res = await axios.post("/api/assessment",responses);
+            const res = await axios.post("/api/assessments",responses);
+
+            console.log("MCQ Response: ", res.data);
 
             if(res.status === 200){
                 toast({
