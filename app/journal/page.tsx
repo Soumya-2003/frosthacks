@@ -35,6 +35,8 @@ const JournalPage = () => {
                 const formattedDate = selectedDate.toISOString().split('T')[0];
                 const res = await axios.get(`/api/journal/view?date=${formattedDate}`);
 
+                console.log("Journal Entry:", res.data); // ✅ Debugging
+
                 if (res.status === 200 && res.data.content) {
                     form.setValue("content", res.data.content);
                 } else {
