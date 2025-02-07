@@ -135,7 +135,7 @@ const JournalPage = () => {
                                         type="submit" 
                                         className="self-end" 
                                         size={'lg'} 
-                                        disabled={selectedDate.getDate() !== new Date().getDate()}>
+                                        >
                                         {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
                                     </Button>
                                 </div>
@@ -149,3 +149,5 @@ const JournalPage = () => {
 };
 
 export default JournalPage;
+
+{/*disabled={selectedDate.getDate() !== new Date().getDate()} */}
