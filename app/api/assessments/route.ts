@@ -4,6 +4,7 @@ import AssessmentModel from '@/models/assessment.schema';
 import { getServerSession } from 'next-auth';
 import axios from 'axios';
 import { authOptions } from '../auth/[...nextauth]/options';
+import { calculateMoodScore } from '@/helpers/calculatedMood';
 
 export async function POST(request: NextRequest) {
   await dbConnect();
@@ -24,8 +25,9 @@ export async function POST(request: NextRequest) {
     const userID = session.user._id; // Assuming the user ID is stored in session.user.id
 
     // Parse the input JSON
-    const data = await request.json();
-    const { responses } = data;
+    const responses = await request.json();
+
+    console.log("Data from frontend: ",responses);
 
     // Validate responses
     if (!Array.isArray(responses) || responses.length !== 7 || !responses.every(r => r >= 1 && r <= 7)) {
@@ -35,16 +37,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call the Flask API for mood analysis
-    const flaskApiUrl = 'http://localhost:5002/analyze-mood';
-    const response = await axios.post(flaskApiUrl, { responses });
-    const { mood_score, mood } = response.data;
+    //Call the mood calclulation function
+    const response = calculateMoodScore(responses);
+    const { moodScore, mood } = response;
 
     // Save the assessment to the database
     const newAssessment = new AssessmentModel({
       userID,
       responses,
-      mood_score,
+      moodScore,
       mood,
     });
 
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Return the results
     return NextResponse.json(
-      { message: 'Assessment submitted successfully', mood_score, mood },
+      { message: 'Assessment submitted successfully', moodScore, mood },
       { status: 200 }
     );
   } catch (error) {
