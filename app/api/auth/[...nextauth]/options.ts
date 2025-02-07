@@ -103,8 +103,6 @@ export const authOptions: NextAuthOptions = {
                 //*To generate unique username for everone
                 token.username = profile?.name?.split(" ")[0].toLowerCase().concat((Math.random()*Math.pow(10,6)).toString()) || profile?.email?.split('@')[0].concat((Math.random()*Math.pow(10,6)).toString());
 
-                token.isVerified = true;
-
                 token.picture = profile?.picture;
 
             }
@@ -115,14 +113,12 @@ export const authOptions: NextAuthOptions = {
             if(token){
                 session.user._id = token._id;
                 session.user.username = token.username;
-                session.user.isVerified = token.isVerified;
                 session.user.profilePicture = token.picture || "";
             }
 
             console.log("session callback", session, token);
             return session;
 
-            return session;
         }
     },
     pages: {

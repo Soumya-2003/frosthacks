@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
 
     const { content, date } = await request.json();
 
+    console.log("Content:", content); // ✅ Debugging
+    console.log("Date:", date); // ✅ Debugging
+
     if (!date) {
       return NextResponse.json(
         {
@@ -70,6 +73,8 @@ export async function POST(request: NextRequest) {
         $lte: endOfTheDay
       }
     })
+
+    console.log("Existing Journal:", existingJournal); // ✅ Debugging
 
     if (!existingJournal) {
       // Create a new journal entry

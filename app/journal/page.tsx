@@ -34,6 +34,8 @@ const JournalPage = () => {
             try {
                 const res = await axios.get(`/api/journal/view?date=${selectedDate}`);
 
+                console.log("Journal Entry:", res.data); // ✅ Debugging
+
                 if (res.status === 200 && res.data.content) {
                     form.setValue("content", res.data.content);
                 } else {
