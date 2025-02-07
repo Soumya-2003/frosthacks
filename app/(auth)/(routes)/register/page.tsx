@@ -42,7 +42,7 @@ const RegisterForm = () => {
 
         try {
             
-            const res = await axios.post('/api/signup');
+            const res = await axios.post('/api/auth/signup', data);
 
             if(res.status === 200){
                 toast({
