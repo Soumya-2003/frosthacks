@@ -23,7 +23,7 @@ const JournalPage = () => {
     const form = useForm<z.infer<typeof journalSchema>>({
         resolver: zodResolver(journalSchema),
         defaultValues: {
-            date: selectedDate,
+            date: selectedDate.toISOString().split('T')[0], // Ensure date is stored in YYYY-MM-DD
             content: ""
         }
     });
@@ -32,7 +32,8 @@ const JournalPage = () => {
     useEffect(() => {
         const fetchJournalEntry = async () => {
             try {
-                const res = await axios.get(`/api/journal/view?date=${selectedDate}`);
+                const formattedDate = selectedDate.toISOString().split('T')[0];
+                const res = await axios.get(`/api/journal/view?date=${formattedDate}`);
 
                 if (res.status === 200 && res.data.content) {
                     form.setValue("content", res.data.content);
@@ -45,30 +46,34 @@ const JournalPage = () => {
         };
 
         fetchJournalEntry();
-        form.setValue("date", selectedDate); // ✅ Manually update date
+        form.setValue("date", selectedDate.toISOString().split('T')[0]); // ✅ Ensure consistent format
 
     }, [selectedDate]);
 
-    // Auto-save journal every 5 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const content = form.getValues("content");
-            if (content.trim() !== "") {
-                handleAutoSave({ date: selectedDate, content });
-            }
-        }, 5000);
+    // // Auto-save journal every 5 seconds
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         const content = form.getValues("content").trim();
+    //         if (content !== "") {
+    //             handleSave(true); // Auto-save mode
+    //         }
+    //     }, 5000);
 
-        return () => clearInterval(interval);
-    }, [selectedDate, form]);
+    //     return () => clearInterval(interval);
+    // }, [selectedDate, form]);
 
-    // Save journal manually
-    const handleSave = async () => {
-        console.log("Manual save triggered!"); // ✅ Debugging
+    // Save journal manually or automatically
+    const handleSave = async (isAutoSave = false) => {
         setIsSaving(true);
 
         try {
-            const data = form.getValues(); // ✅ Get values manually
-            console.log("Saving Data:", data); // ✅ Debugging
+            const data = {
+                date: selectedDate.toISOString().split('T')[0],
+                content: form.getValues("content"),
+            };
+
+            console.log("Form data: ",data.date);
+
             const res = await axios.post('/api/journal', data);
 
             if (res.status === 200) {
@@ -79,26 +84,15 @@ const JournalPage = () => {
             }
         } catch (error) {
             console.error("Journal save error:", error);
-            toast({
-                title: "Error",
-                description: "Failed to save journal!",
-                variant: "destructive"
-            });
+                toast({
+                    title: "Error",
+                    description: "Failed to save journal!",
+                    variant: "destructive"
+                });
         } finally {
             setIsSaving(false);
         }
     };
-
-    // Auto-save API call
-    const handleAutoSave = async (data: z.infer<typeof journalSchema>) => {
-        try {
-            await axios.post('/api/journal', data);
-        } catch (error) {
-            console.error("Auto-save error:", error);
-        }
-    };
-
-    console.log("Selected Date: ", selectedDate);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full max-w-7xl p-4 lg:p-6">
