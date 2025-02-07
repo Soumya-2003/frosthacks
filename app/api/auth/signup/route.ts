@@ -13,14 +13,13 @@ const DEFAULT_PROFILE_PICTURE = "https://cdn1.iconfinder.com/data/icons/user-pic
 export async function POST(request: NextRequest) {
   await dbConnect();
   try {
-    const formData = await request.formData(); // Handle form-data request
-    const username = formData.get("username") as string || getRandomUsername("user"); // Generate a random username if not provided
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const role = (formData.get("role") as string) || "user";
-    const age = formData.get("age") ? parseInt(formData.get("age") as string) : undefined;
-    const gender = formData.get("gender") as string;
-    const profilePictureFile = formData.get("profilePicture") as File | null;
+    const {
+      username,
+      email,
+      password,
+      age,
+      gender
+    } = await request.json();
 
     // Validate required fields
     if (!username || !email || !password) {
@@ -44,11 +43,11 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Upload profile picture to Cloudinary
-    let profilePictureUrl = DEFAULT_PROFILE_PICTURE;
-    if (profilePictureFile !== null) {
-      const uploadedImageUrl = await uploadToCloudinary(profilePictureFile);
-      if (uploadedImageUrl) profilePictureUrl = uploadedImageUrl;
-    }
+    // let profilePictureUrl = DEFAULT_PROFILE_PICTURE;
+    // if (profilePictureFile !== null) {
+    //   const uploadedImageUrl = await uploadToCloudinary(profilePictureFile);
+    //   if (uploadedImageUrl) profilePictureUrl = uploadedImageUrl;
+    // }
 
     // Generate a 6-digit verification code
     const verifyCode = generateVerifyCode();
@@ -67,13 +66,13 @@ export async function POST(request: NextRequest) {
       username,
       email,
       password: hashedPassword,
-      role,
+      role: "user",
       age,
       gender,
       isVerified: false,
       verificationToken: generateVerificationToken(), // Generate a verification token
       verifyCode: generateVerifyCode(), 
-      profilePicture: profilePictureUrl || "",
+      profilePicture: "",
     });
 
     await newUser.save();
