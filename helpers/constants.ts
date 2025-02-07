@@ -38,7 +38,8 @@ enum Routes {
     SocialMediaAnalysis = "/social-media-analysis",
     Journal = "/journal",
     Report = "/reports",
-    MoodForcasting = "/mood-forecasting"
+    MoodForcasting = "/mood-forecasting",
+    Entertainment = "/entertainment"
 }
 
 enum AssessmentOptions {
@@ -46,6 +47,14 @@ enum AssessmentOptions {
     Questionaire = "Questionaire",
     SentenceFormation = "SentenceFormation"
 }
+
+enum SentimentCategory {
+    VERY_NEGATIVE,
+    NEGATIVE,
+    NEUTRAL,
+    POSITIVE,
+    VERY_POSITIVE,
+  }
 
 export { 
     APP_NAME,
@@ -55,5 +64,6 @@ export {
     getRandomElement,
     SocialMedia,
     Routes,
-    AssessmentOptions
+    AssessmentOptions,
+    SentimentCategory
 }

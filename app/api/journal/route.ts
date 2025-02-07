@@ -21,6 +21,9 @@ export async function POST(request: NextRequest) {
     // Extract request body
     const { content, date } = await request.json();
 
+    console.log("Content:", content); // ✅ Debugging
+    console.log("Date:", date); // ✅ Debugging
+
     if (!date) {
       return NextResponse.json(
         { message: "Date is missing." },
@@ -54,6 +57,8 @@ export async function POST(request: NextRequest) {
 
     // Check if a journal entry already exists for that date
     const existingJournal = await JournalModel.findOne({ date: formattedDate, userID });
+
+    console.log("Existing Journal:", existingJournal); // ✅ Debugging
 
     if (!existingJournal) {
       // Create a new journal entry

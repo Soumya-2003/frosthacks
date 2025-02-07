@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 
+
 const DashboardPage = () => {
 
     const { data: session } = useSession();
@@ -128,6 +129,25 @@ const DashboardPage = () => {
                         <Image
                             src={social}
                             alt="social"
+                            height={600}
+                            width={600}
+                            className="object-cover absolute -bottom-24 -right-16 p-0 m-0"
+                        />
+                    </WobbleCard>
+                </Link>
+
+                <Link href={Routes.Entertainment} >
+                    <WobbleCard
+                        containerClassName="col-span-1 h-full min-h-[300px] bg-violet-600"
+                    >
+                        <h2
+                            className={cn("text-lg md:text-2xl lg:text-4xl font-extrabold", poppins.className)}
+                        >
+                            Entertainment
+                        </h2>
+                        <Image
+                            src={report}
+                            alt="report"
                             height={600}
                             width={600}
                             className="object-cover absolute -bottom-24 -right-16 p-0 m-0"
