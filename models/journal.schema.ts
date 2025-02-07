@@ -1,19 +1,11 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose from 'mongoose';
 
-export interface Journal extends Document {
-  userID: string;   
-  content: string;
-  date: Date;    
-}
-
-const journalSchema: Schema<Journal> = new Schema({
-  userID: { type: String, required: true },
-  date: { type: Date, default: Date.now, required: true }, 
+const JournalSchema = new mongoose.Schema({
+  userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  date: { type: String, required: true }, // Store date as a string in "dd-mm-yyyy"
   content: { type: String, required: true },
 });
 
-const JournalModel =
-  (mongoose.models.Journal as mongoose.Model<Journal>) ||
-  mongoose.model<Journal>('Journal', journalSchema);
+const JournalModel = mongoose.models.Journal || mongoose.model('Journal', JournalSchema);
 
 export default JournalModel;

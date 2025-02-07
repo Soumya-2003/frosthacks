@@ -30,13 +30,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const currentDate = new Date(date);
+    // Convert input date to "DD-MM-YYYY"
+    const gotDate = new Date(date);
+    if (isNaN(gotDate.getTime())) {
+      return NextResponse.json(
+        { message: "Invalid date format." },
+        { status: 400 }
+      );
+    }
 
-    const startOfTheDay = currentDate.setHours(0,0,0,0);
-    const endOfTheDay = currentDate.setHours(23,59,59,999);
+    const formattedDate = `${gotDate.getDate().toString().padStart(2, '0')}-${(gotDate.getMonth() + 1).toString().padStart(2, '0')}-${gotDate.getFullYear()}`;
 
     // Find the journal entry for the specified user and date
-    const journalEntry = await JournalModel.findOne({ userID: session.user._id, date: { $gte: startOfTheDay, $lte: endOfTheDay } });
+    const journalEntry = await JournalModel.findOne({
+      userID: session.user._id,
+      date: formattedDate,
+    });
 
     if (!journalEntry) {
       return NextResponse.json(
@@ -50,7 +59,7 @@ export async function GET(request: NextRequest) {
       {
         message: 'Journal entry retrieved successfully',
         content: journalEntry.content,
-        date: journalEntry.date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        date: journalEntry.date, // Already stored as "DD-MM-YYYY"
       },
       { status: 200 }
     );
