@@ -4,21 +4,23 @@ import axios from "axios";
 export async function POST(request: NextRequest) {
   try {
     // Parse the request body
-    const { sentence, word } = await request.json();
+    const { responses, date } = await request.json();
 
-    if (!sentence || !word) {
+    if (!responses || !date) {
       return NextResponse.json(
-        { error: "Both 'sentence' and 'word' are required." },
+        { error: "Both 'responses' and 'date' are required." },
         { status: 400 }
       );
     }
 
-    // Call the Flask API
-    const flaskApiUrl = "http://localhost:5000/analyze-sentence";
-    const response = await axios.post(flaskApiUrl, { sentence, word });
+    console.log("Data from frontend sentence: ",responses);
+
+    // // Call the Flask API
+    // const flaskApiUrl = "http://localhost:5000/analyze-sentence";
+    // const response = await axios.post(flaskApiUrl, { sentence, word });
 
     // Return the Flask API response to the client
-    return NextResponse.json(response.data, { status: 200 });
+    return NextResponse.json("response.data", { status: 200 });
   } catch (error: any) {
     console.error("Error calling Flask API:", error);
     if (error.code === "ECONNREFUSED") {

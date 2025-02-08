@@ -10,6 +10,7 @@ import { THANKS_MESSAGE } from "@/helpers/constants";
 import { poppins } from "@/helpers/fonts";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import axios from "axios";
 
 interface ResponseEntry {
     prompt: string;
@@ -52,12 +53,35 @@ const SentenceFormation = () => {
         setUserResponses(responses);
     };
 
-    const handleFinalSubmit = () => {
+    // Function to send responses to the backend
+    const sendResponsesToDatabase = async (responses: ResponseEntry[]) => {
+        const today = new Date().toISOString().split("T")[0];
+
+        try {
+            const formattedResponses = responses.map((entry) => ({
+                promptWords: entry.prompt, // The given words for sentence formation
+                userResponse: entry.response, // The sentence user formed
+            }));
+
+            const response = await axios.post("/api/analyze-sentence", {
+                date: today,
+                responses: formattedResponses,
+            });
+
+            console.log("Response stored:", response.data);
+        } catch (error) {
+            console.error("Error storing responses:", error);
+        }
+    };
+
+    const handleFinalSubmit = async() => {
         const today = new Date().toISOString().split('T')[0];
         setResponseHistory((prevHistory) => ({
             ...prevHistory,
             [today]: [...(prevHistory[today] || []), ...userResponses]
         }));
+
+        await sendResponsesToDatabase(userResponses);
         setIsSubmitted(true);
     };
 
