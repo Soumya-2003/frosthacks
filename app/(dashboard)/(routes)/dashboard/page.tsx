@@ -1,7 +1,5 @@
 'use client'
 
-
-import { MoodHistoryChart } from "@/components/moodHistory";
 import { journal, mood, notepad3, report, social } from "@/assets/assets";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { APP_NAME, getRandomElement, motivationalQuotes, Routes } from "@/helpers/constants";
@@ -62,7 +60,7 @@ const DashboardPage = () => {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full"
             >
                 <WobbleCard
-                    containerClassName="col-span-1 lg:col-span-3 h-full bg-green-600 min-h-[300px] flex flex-col justify-center"
+                    containerClassName="col-span-1 lg:col-span-2 h-full bg-green-600 min-h-[300px] flex flex-col justify-center"
                 >
                     <h2
                         className={cn("text-xl md:text3xl lg:text-4xl text-black font-extrabold", rubik.className)}
@@ -181,11 +179,6 @@ const DashboardPage = () => {
                         />
                     </WobbleCard>
                 </Link>
-            </div>
-            <div
-                className="w-full flex justify-center items-center"
-            >
-                <MoodHistoryChart />
             </div>
         </div>
     );

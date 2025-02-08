@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python 
+*/**/*.pyc
+ __pycache__/
+ *.pyc
+*.py[cod]
+*$py.class
+/flask-api/__pycache__

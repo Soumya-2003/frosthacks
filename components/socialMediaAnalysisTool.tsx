@@ -14,13 +14,16 @@ import { cn } from "@/lib/utils";
 import { SocialMedia } from '@/helpers/constants';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/loadingSpinner';
+import axios from 'axios';
+import { TweetBoxes } from './socialMedia/tweetBox';
+import { TwitterResult } from './socialMedia/twitterResult';
 
 interface Sentiment {
     name: string;
     value: number;
 }
 
-interface ChildNode {
+export interface ChildNode {
     name: string;
     value: number;
     children: Sentiment[];
@@ -31,10 +34,17 @@ interface MockData {
     children: ChildNode[];
 }
 
+export interface AnalyedData {
+    positive: ChildNode[];
+    negative: ChildNode[];
+}
+
 const SocialMediaAnalysisTool: React.FC = () => {
     const [socialMedia, setSocialMedia] = useState<SocialMedia>(SocialMedia.Twitter);
     const [username, setUsername] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [tweets, setTweets] = useState<Array<string>>([]);
+    const [analyedData, setAnalyedData] = useState<AnalyedData | null>(null);
     const [chartData, setChartData] = useState<MockData | null>(null);
     const chartRef = useRef<HTMLDivElement | null>(null);
     const { toast } = useToast();
@@ -97,57 +107,32 @@ const SocialMediaAnalysisTool: React.FC = () => {
         setChartData(null);
 
         try {
-            const data = await mockApi("@" + username.trim());
-            setChartData(data);
-        } catch (error) {
-            console.error("API Error:", error);
-            // TODO: remove alert after fixing toast hook
-            alert("Failed to fetch data. Please try again later.");
-            toast({
-                title: "Failed to fetch data. Please try again later."
+            const res = await axios.post('/api/social-media/twitter', {
+                'username': username
             });
-        } finally {
+            
+            if (res.status === 200) {
+                setLoading(false);
+                console.log(res?.data)
+                const { name, children, tweets } = res?.data;
+                
+                setChartData({
+                    name,
+                    children
+                  });
+
+                setTweets(tweets);
+
+                setAnalyedData({
+                    positive: children[0].data,
+                    negative: children[1].data,
+                })                
+            }
+        } catch (error) {
+            console.log("Journal analysis error: ", error);
             setLoading(false);
         }
-    };
 
-    const mockApi = (username: string): Promise<MockData> => {
-        // TODO: replace with flask api
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(getMockTwitterData(username));
-            }, 2000);
-        });
-    };
-
-    const getMockTwitterData = (username: string): MockData => {
-        return {
-            name: username,
-            children: [
-                {
-                    name: "Positive",
-                    value: 70,
-                    children: [
-                        { name: "Sentiment 1", value: 15 },
-                        { name: "Sentiment 2", value: 20 },
-                        { name: "Sentiment 3", value: 10 },
-                        { name: "Sentiment 4", value: 15 },
-                        { name: "Sentiment 5", value: 10 },
-                    ],
-                },
-                {
-                    name: "Negative",
-                    value: 30,
-                    children: [
-                        { name: "Sentiment 1", value: 10 },
-                        { name: "Sentiment 2", value: 5 },
-                        { name: "Sentiment 3", value: 5 },
-                        { name: "Sentiment 4", value: 5 },
-                        { name: "Sentiment 5", value: 5 },
-                    ],
-                },
-            ],
-        };
     };
 
     return (
@@ -229,9 +214,18 @@ const SocialMediaAnalysisTool: React.FC = () => {
 
                     {chartData && (
                         <div id="chartdiv" ref={chartRef} className="w-full h-64 sm:h-80">
-                            {/* The chart will be rendered here by AMCharts */}
+                            {/* The chart will be rendered here */}
                         </div>
                     )}
+
+                    {!loading && analyedData && (
+                        <div>
+                            <h1 className="text-lg text-center mb-3 mt-8">Analyzed Data</h1>
+                             <TwitterResult analyzedData={analyedData} tweets={tweets} />
+                        </div>
+                       )}
+
+
                 </CardContent>
             </Card>
         </motion.div>

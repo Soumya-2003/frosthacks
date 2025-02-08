@@ -121,7 +121,6 @@ const JournalPage = () => {
     const handlePredictMood = async () => {
         setIsOpen(true);
         try {
-            console.log(">>sending content", form.getValues("content"))
             const res = await axios.post('/api/journal/analyze-content', {
                 'content': form.getValues("content")
             });
