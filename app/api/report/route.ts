@@ -40,13 +40,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { current_date } = await request.json();
+    const { weekly_assessment, current_date } = await request.json();
 
     // Retrieve the last 7 days of journal entries for the user
     const sevenDaysAgo = new Date(current_date);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const startDate = `${sevenDaysAgo.getDate().toString().padStart(2, '0')}-${(sevenDaysAgo.getMonth() + 1).toString().padStart(2, '0')}-${sevenDaysAgo.getFullYear()}`;
-
 
     const userID = existingUser._id;
 
@@ -54,6 +53,8 @@ export async function POST(request: NextRequest) {
       userID,
       date: { $gte: startDate },
     }).sort({ date: 1 });
+
+    console.log(journals)
 
     if (!journals || journals.length === 0) {
       return NextResponse.json(
@@ -63,27 +64,19 @@ export async function POST(request: NextRequest) {
     }
 
     const journalEntries: { [key: string]: string } = {};
-    journals.forEach((journal, index) => {
-      journalEntries[`Day ${index + 1}`] = journal.content;
+    journals.forEach((journal) => {
+      journalEntries[journal.date] = journal.content;
     });
 
-    console.log(journalEntries);
-
     // Call the Flask API for sentiment analysis
-    const flaskApiUrl = 'http://localhost:5000/analyze-weekly-data';
-    const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries });
-    const emotionResults = response.data;
+    const flaskApiUrl = 'http://localhost:5000/weekly-report';
+    const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries, weekly_assessment: weekly_assessment });
+    const reportResponse = response.data;
 
-    // TODO: fix savng in Sentiment Table
-    // Save the sentiment analysis results to the database
-    // const newSentiment = new SentimentModel({
-    //   userID,
-    //   results: emotionResults,
-    // });
-    // await newSentiment.save();
+    // TODO: Save result
 
     return NextResponse.json(
-      { message: 'Emotion analysis completed successfully', results: emotionResults },
+      { message: 'Emotion analysis completed successfully', results: reportResponse},
       { status: 200 }
     );
   } catch (error) {
