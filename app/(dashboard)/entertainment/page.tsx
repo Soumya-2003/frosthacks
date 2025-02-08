@@ -1,5 +1,4 @@
-'use client'
-
+'use client';
 import { useState } from "react";
 
 const API_URL = "http://localhost:5000/analyze-preferences";
