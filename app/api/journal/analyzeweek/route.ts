@@ -40,18 +40,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const userID = existingUser._id;
+
     // Retrieve the last 7 days of journal entries for the user
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const userID = existingUser._id;
-
+    const startDate = `${sevenDaysAgo.getDate().toString().padStart(2, '0')}-${(sevenDaysAgo.getMonth() + 1).toString().padStart(2, '0')}-${sevenDaysAgo.getFullYear()}`;
     const journals = await JournalModel.find({
-      userID,
-      date: { $gte: sevenDaysAgo },
+      date: { $gte: startDate },
     }).sort({ date: 1 });
-
-    
 
     if (!journals || journals.length === 0) {
       return NextResponse.json(
@@ -64,19 +61,19 @@ export async function POST(request: NextRequest) {
     journals.forEach((journal, index) => {
       journalEntries[`Day ${index + 1}`] = journal.content;
     });
-
+    console.log("reaching here")
     // Call the Flask API for sentiment analysis
     const flaskApiUrl = 'http://localhost:5000/analyze-weekly-data';
     const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries });
     const emotionResults = response.data;
 
+    // TODO: fix saving result in Sentiment Table
     // Save the sentiment analysis results to the database
-    const newSentiment = new SentimentModel({
-      userID,
-      results: emotionResults,
-    });
-
-    await newSentiment.save();
+    // const newSentiment = new SentimentModel({
+    //   userID,
+    //   results: emotionResults,
+    // });
+    // await newSentiment.save();
 
     return NextResponse.json(
       { message: 'Emotion analysis completed successfully', results: emotionResults },
