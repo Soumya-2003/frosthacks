@@ -46,8 +46,15 @@ export async function POST(request: NextRequest) {
     console.log("recieveing content", content);
     // Call the Flask API for sentiment analysis
     const flaskApiUrl = 'http://localhost:5000/analyze-content';
-    const response = await axios.post(flaskApiUrl, { content: content });
-    const emotionResults = response.data;
+    let emotionResults;
+    try {
+      const response = await axios.post(flaskApiUrl, { content: content });
+      emotionResults = response.data;
+
+      console.log("Python Flask Response: ", emotionResults);
+    } catch (error) {
+      console.log("Flask error inside content analysis: ", error);
+    }
 
     // Add logic to save the result the sentiment analysis results to the database
 
