@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import cloudinary from '@/lib/cloudinary';
 import { getRandomUsername } from '@/helpers/generateRandomUsername';
 import { sendVerificationEmail } from '@/helpers/sendVerificationMail';
+import dayjs from 'dayjs';
 
 const DEFAULT_PROFILE_PICTURE = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/unknown-512.png";
 
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
     //   if (uploadedImageUrl) profilePictureUrl = uploadedImageUrl;
     // }
 
+
     // Create a new user
     const newUser = new UserModel({
       username,
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
       age,
       gender,
       profilePicture: "",
+      loginHistory: []
     });
 
     await newUser.save();
