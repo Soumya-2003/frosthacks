@@ -210,3 +210,5 @@ const JournalPage = () => {
 };
 
 export default JournalPage;
+
+{/*disabled={selectedDate.getDate() !== new Date().getDate()} */}
