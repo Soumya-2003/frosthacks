@@ -1,6 +1,6 @@
 'use client'
 
-import { journal, mood, notepad3, report, social } from "@/assets/assets";
+import { entertainment, journal, mood, notepad3, report, social } from "@/assets/assets";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { APP_NAME, getRandomElement, motivationalQuotes, Routes } from "@/helpers/constants";
 import { cn } from "@/lib/utils";
@@ -166,16 +166,16 @@ const DashboardPage = () => {
                         containerClassName="col-span-1 h-full min-h-[300px] bg-violet-600"
                     >
                         <h2
-                            className={cn("text-lg md:text-2xl lg:text-4xl font-extrabold", poppins.className)}
+                            className={cn("text-lg md:text-2xl lg:text-3xl font-extrabold", poppins.className)}
                         >
                             Entertainment
                         </h2>
                         <Image
-                            src={report}
-                            alt="report"
-                            height={600}
-                            width={600}
-                            className="object-cover absolute -bottom-24 -right-16 p-0 m-0"
+                            src={entertainment}
+                            alt="entertainment"
+                            height={500}
+                            width={500}
+                            className="object-cover absolute -bottom-16 -right-12 p-0 m-0"
                         />
                     </WobbleCard>
                 </Link>
