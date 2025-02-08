@@ -63,12 +63,14 @@ const SentenceFormation = () => {
                 userResponse: entry.response, // The sentence user formed
             }));
 
+            console.log("Responses to be stored:", formattedResponses);
+
             const response = await axios.post("/api/analyze-sentence", {
                 date: today,
                 responses: formattedResponses,
             });
 
-            console.log("Response stored:", response.data);
+            console.log("Response stored:", response.data.data);
         } catch (error) {
             console.error("Error storing responses:", error);
         }

@@ -23,11 +23,11 @@ const mentalHealthQuestions: string[] = [
 ];
 
 export const prompts = [
-    ["happy", "book", "rain", "chair"],
-    ["angry", "cloud", "teacher", "window"],
-    ["joy", "friend", "journey", "river"],
-    ["sun", "mountain", "excited", "adventure"],
-    ["peace", "garden", "silence", "night"],
+    ["happy"],
+    ["angry"],
+    ["joy"],
+    ["sun"],
+    ["peace"],
 ];
 
 export const imageBasedQuestions: StaticImageData[] = [
