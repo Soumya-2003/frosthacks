@@ -1,72 +1,94 @@
-import ssl
-import json
-from nltk.sentiment import SentimentIntensityAnalyzer
-import nltk
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+import torch.nn.functional as F
 
-ssl._create_default_https_context = ssl._create_unverified_context
-# Ensure VADER lexicon is downloaded
-nltk.download('vader_lexicon')
+# Load fine-tuned RoBERTa for emotion detection
+model_name = "SamLowe/roberta-base-go_emotions"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
-def analyze_sentiment(sentences):
+# Define emotion labels from GoEmotions dataset
+emotion_labels = [
+    "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion",
+    "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment",
+    "excitement", "fear", "gratitude", "grief", "joy", "love", "neutral",
+    "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise"
+]
+
+# Map detailed emotions to core categories
+emotion_mapping = {
+    "joy": "happy", "amusement": "happy", "excitement": "happy", "love": "happy", "optimism": "happy",
+    "admiration": "happy", "approval": "happy", "gratitude": "happy", "pride": "happy",
+    "sadness": "sad", "grief": "sad", "disappointment": "sad", "embarrassment": "sad",
+    "remorse": "sad", "desire": "sad", "disgust": "sad",
+    "fear": "anxious", "neutral": "anxious", "surprise": "anxious", "confusion": "anxious", "curiosity": "anxious",
+    "anger": "depressed", "annoyance": "depressed", "disapproval": "depressed", "realization": "sad"
+}
+
+def analyze_sentiment(content):
     """
-    Analyzes the sentiment of a list of sentences using VADER.
-    It also calculates the overall sentiment of the paragraph.
+    Analyze emotions for a given text content.
 
     Args:
-        sentences (list): A list of sentences as input.
+        content (str): The input text.
 
     Returns:
-        dict: JSON formatted output with individual and overall sentiment results.
+        dict: Emotion probabilities and overall mood.
     """
-    sia = SentimentIntensityAnalyzer()
-    results = {}
-    
-    overall_compound = 0  # Sum of all compound scores
-    positive_count = 0
-    negative_count = 0
-    neutral_count = 0
+    if not content.strip():
+        return {"error": "Empty input received."}
 
-    for sentence in sentences:
-        scores = sia.polarity_scores(sentence)
-        compound = scores["compound"]
+    # Initialize emotion scores
+    emotion_scores = {"happy": 0, "sad": 0, "anxious": 0, "depressed": 0}
 
-        if compound >= 0.05:
-            mood = "Positive"
-            positive_count += 1
-        elif compound <= -0.05:
-            mood = "Negative"
-            negative_count += 1
-        else:
-            mood = "Neutral"
-            neutral_count += 1
+    # Merge multi-line text into a single cleaned string
+    processed_text = content.replace("\n", " ").strip()
 
-        overall_compound += compound
+    # Tokenize input
+    inputs = tokenizer(processed_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
 
-        results['content'] = {
-            "sentiment_score": compound,
-            "mood": mood
-        }
+    # Get model predictions
+    with torch.no_grad():
+        outputs = model(**inputs)
 
-    # Calculate average sentiment score for overall paragraph
-    avg_compound = overall_compound / len(sentences)
+    # Convert logits to probabilities
+    probs = F.softmax(outputs.logits, dim=-1)
 
-    # Determine overall sentiment
-    if avg_compound >= 0.05:
-        overall_mood = "Positive"
-    elif avg_compound <= -0.05:
-        overall_mood = "Negative"
-    else:
-        overall_mood = "Neutral"
+    # Ensure valid probabilities
+    if probs.numel() == 0:
+        return {"error": "No emotion probabilities found."}
 
-    # Add overall sentiment result
-    results["overall_sentiment"] = {
-        "average_sentiment_score": round(avg_compound, 4),
-        "mood": overall_mood,
-        "positive_sentences": positive_count,
-        "negative_sentences": negative_count,
-        "neutral_sentences": neutral_count
+    # Get the number of emotions available
+    num_emotions = min(3, probs.shape[1])  # Ensure we don't exceed available emotions
+    if num_emotions == 0:
+        return {"error": "No valid emotions detected."}
+
+    # Get top predicted emotions safely
+    top_emotions = torch.topk(probs, num_emotions)
+
+    # Map detected emotions to core categories
+    for idx in range(num_emotions):
+        emotion_idx = top_emotions.indices[0][idx].item()
+        
+        # Ensure the index is within bounds
+        if emotion_idx >= len(emotion_labels):
+            continue  # Skip if index is out of range
+
+        emotion = emotion_labels[emotion_idx]
+        probability = top_emotions.values[0][idx].item()
+        
+        core_emotion = emotion_mapping.get(emotion, "other")
+        if core_emotion in emotion_scores:
+            emotion_scores[core_emotion] += probability
+
+    # Determine overall mood
+    overall_mood = max(emotion_scores, key=emotion_scores.get)
+
+    # Prepare the result
+    result = {
+        "content": content,
+        "emotion_scores": emotion_scores,
+        "overall_mood": overall_mood.upper()
     }
 
-    return results
-
- 
+    return result
