@@ -15,11 +15,8 @@ import { APP_NAME } from '@/helpers/constants';
 import axios from 'axios';
 import { Card } from '@/components/ui/card';
 import { useSession } from 'next-auth/react';
-
-interface ApiResponse {
-    success: boolean;
-    data: DayData[];
-}
+import { JournalReportBox } from '@/components/reports/journalReportBox';
+import { AssessmentReportBox } from '@/components/reports/assessmentReportBox';
 
 interface DayData {
     day: string;
@@ -33,7 +30,7 @@ interface Trait {
     index: number;
 }
 
-interface EmotionResults {
+export interface EmotionResults {
     overall_mood: string;
     overall_emotions: {
         happy: number;
@@ -124,32 +121,21 @@ const ReportPage: React.FC = () => {
                             </Button>
                         </div>
                     </div>
-                    <div ref={targetRef} className={cn("pt-4 pl-4", poppins.className)}>
-                        <h4>{APP_NAME} Report</h4>
-                        <h4> Patient Name:  {session?.user.name} </h4>
-                        <h4>Report week: {formatWeek(currentDate)}</h4>
-                        <ChartContainer data={weeklyReport} />
+                    <div ref={targetRef}>
+                        <span className={cn("pt-4 pl-4", poppins.className)}>
+                            <h4>{APP_NAME} Report</h4>
+                            <h4> Patient Name:  {session?.user.name} </h4>
+                            <h4>Report week: {formatWeek(currentDate)}</h4>
+                            <h1 className='text-lg text-center mb-3 mt-8'>Overall Weekly Report</h1>
+                            <ChartContainer data={weeklyReport} />
+                        </span>
+                        {!loading && journalAnalysis ? <JournalReportBox {...journalAnalysis} /> : null}
+                        {!loading ? <AssessmentReportBox currentDate={currentDate} /> : null}
                     </div>
                     {loading && <LoadingSpinner />}
                     {error && <ErrorMessage message={error} />}
                 </div>
-                <div>
-                    <h2>
-                        {journalAnalysis?.overall_mood}
-                    </h2>
-                    <h2>
-                        {journalAnalysis?.overall_emotions.happy}
-                    </h2>
-                    <h2>
-                        {journalAnalysis?.overall_emotions.sad}
-                    </h2>
-                    <h2>
-                        {journalAnalysis?.overall_emotions.anxious}
-                    </h2>
-                    <h2>
-                        {journalAnalysis?.overall_emotions.depressed}
-                    </h2>
-                </div>
+
             </Card>
         </motion.div>
     );
