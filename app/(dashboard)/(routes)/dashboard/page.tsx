@@ -10,6 +10,8 @@ import { poppins, rubik } from "@/helpers/fonts";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import axios from "axios";
+import { useEffect } from "react";
 
 
 
@@ -26,6 +28,19 @@ const DashboardPage = () => {
         if (hour >= 18 && hour < 21) return "Good Evening";
         return "Good Night";
     };
+
+    useEffect(() => {
+        const recordLogin = async () => {
+            try {
+                const response = await axios.post("/api/daily-login",{});
+                console.log(response.data.message);
+            } catch (error: any) {
+                console.error("Login tracking failed:", error);
+            }
+        };
+
+        recordLogin();
+    }, []);
 
     return (
         <div
