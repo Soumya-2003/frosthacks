@@ -40,17 +40,15 @@ export async function POST(request: NextRequest) {
 
     // Call the Flask API for mood analysis
     const flaskApiUrl = 'http://localhost:5000/analyze-content';
-    const response = await axios.post(flaskApiUrl, { content });
+    let emotionResults;
+    try {
+      const response = await axios.post(flaskApiUrl, { content: content });
+      emotionResults = response.data;
 
-    // Handle response from Flask API
-    if (response.status !== 200) {
-      return NextResponse.json(
-        { message: "Error analyzing journal content." },
-        { status: response.status }
-      );
+      console.log("Python Flask Response: ", emotionResults);
+    } catch (error) {
+      console.log("Flask error inside content analysis: ", error);
     }
-
-    const emotionResults = response.data;
 
     // Return the analyzed mood/emotion to the user
     return NextResponse.json(
