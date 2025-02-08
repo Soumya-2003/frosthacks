@@ -14,7 +14,7 @@ emotion_labels = [
     "admiration", "amusement", "anger", "annoyance", "approval", "caring", "confusion",
     "curiosity", "desire", "disappointment", "disapproval", "disgust", "embarrassment",
     "excitement", "fear", "gratitude", "grief", "joy", "love", "nervousness",
-    "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise"
+    "optimism", "pride", "realization", "relief", "remorse", "sadness", "surprise", "neutral"
 ]
 
 # Map detailed emotions to core categories
@@ -22,7 +22,7 @@ emotion_mapping = {
     "joy": "happy", "amusement": "happy", "excitement": "happy", "love": "happy", "optimism": "happy",
     "sadness": "sad", "grief": "sad", "disappointment": "sad",
     "fear": "anxious", "nervousness": "anxious",
-    "anger": "depressed", "remorse": "depressed", "disapproval": "depressed"
+    "anger": "depressed", "remorse": "depressed", "disapproval": "depressed", "neutral": "happy"
 }
 
 def weekly_sentiment_analysis(journal_entries):
@@ -50,7 +50,7 @@ def weekly_sentiment_analysis(journal_entries):
         for idx in range(len(top_emotions.indices[0])):
             try:
                 emotion_index = top_emotions.indices[0][idx].item()
-                if emotion_index < len(emotion_labels):
+                if 0 <= emotion_index < len(emotion_labels):
                     emotion = emotion_labels[emotion_index]
                     probability = top_emotions.values[0][idx].item()
                     core_emotion = emotion_mapping.get(emotion, "other")
