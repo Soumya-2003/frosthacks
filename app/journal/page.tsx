@@ -119,9 +119,10 @@ const JournalPage = () => {
     const handlePredictMood = async () => {
         setIsOpen(true);
         try {
-            const res = await axios.post('/api/journal/analyze-content', {
-                content: form.getValues("content")
-            });
+            const res = await axios.post('/api/journal/analyze-content', { content : form.getValues("content")});
+
+            console.log('Mood Analysis Response: ',res.data);
+            
             
             if (res.status === 200) {
                 setMoodScore(res?.data.content.sentiment_score);
