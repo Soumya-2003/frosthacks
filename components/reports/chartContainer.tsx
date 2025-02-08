@@ -120,10 +120,10 @@ const ChartContainer: React.FC<ChartContainerProps> = ({ data }) => {
       .attr("x", 250)
       .attr("y", 250)
       .attr("text-anchor", "middle")
-      .attr("font-size", "20px")
+      .attr("font-size", "10px")
       .attr("font-weight", "bold")
       .style("fill", "#eb477e")
-      .text(title.substr(0, 3));
+      .text(title);
   };
 
   return (

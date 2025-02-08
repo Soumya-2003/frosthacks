@@ -4,6 +4,7 @@ import dbConnect from '@/lib/db';
 import UserModel from '@/models/user.schema';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/options';
+import dayjs from 'dayjs';
 
 export async function POST(req: Request) {
     try {
@@ -26,10 +27,13 @@ export async function POST(req: Request) {
         }
 
         const today = new Date();
-        const loginEntry = { date: today.toISOString() };
+        const loginEntry = dayjs(today).format("YYYY-MM-DD");
         user.loginHistory.push(loginEntry);
 
         await user.save();
+
+        console.log("Updated user: ", user);
+
         return NextResponse.json({ message: "Login recorded successfully." }, { status: 200 });
     } catch (error) {
         console.error("Error recording login:", error);
