@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, model } from "mongoose";
 
-interface ISentenceAnalysis extends Document {
+interface SentenceAnalysis extends Document {
     userID: mongoose.Types.ObjectId;
     word: string;
     sentence: string;
@@ -8,7 +8,7 @@ interface ISentenceAnalysis extends Document {
     date: Date;
 }
 
-const SentenceAnalysisSchema = new Schema<ISentenceAnalysis>(
+const sentenceAnalysisSchema = new Schema<SentenceAnalysis>(
     {
         userID: { type: Schema.Types.ObjectId, ref: "User", required: true },
         word: { type: String, required: true },
@@ -19,5 +19,7 @@ const SentenceAnalysisSchema = new Schema<ISentenceAnalysis>(
     { timestamps: true }
 );
 
-const SentenceAnalysisModel = model<ISentenceAnalysis>("SentenceAnalysis", SentenceAnalysisSchema);
+const SentenceAnalysisModel = (mongoose.models.SentenceAnalysis as mongoose.Model<SentenceAnalysis>) || (mongoose.model<SentenceAnalysis>("SentenceAnalysis", sentenceAnalysisSchema));
+
+
 export default SentenceAnalysisModel;
