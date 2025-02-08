@@ -6,6 +6,7 @@ from weekly_analysis import weekly_sentiment_analysis
 from social_media_analyzer import twitter_analyzer
 import os
 from dotenv import load_dotenv
+from report.emotion_analysis import generate_weekly_report
 
 load_dotenv()
 
@@ -23,6 +24,22 @@ client = tweepy.Client(bearer_token=BEARER_TOKEN)
 @app.route('/')
 def home():
     return "Welcome to the Sentiment Analysis API! Use the /analyze endpoint to analyze journal entries."
+
+@app.route('/weekly-report', methods=['POST'])
+def weekly_report():
+    try:
+        data = request.get_json()
+        print(data)
+        journal_entries = data.get('journal_entries', {})
+        weekly_assessment = data.get('weekly_assessment', {})
+        
+        if not journal_entries:
+            return jsonify({"success": False, "message": "No journal entries provided"}), 400
+        report = generate_weekly_report(journal_entries, weekly_assessment)
+        return jsonify(report)
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"success": False, "message": "An error occurred while processing the request"}), 500
 
 @app.route('/twitter-sentiment', methods=['POST'])
 def twitter_sentiment_analysis():

@@ -41,12 +41,18 @@ export async function POST(request: NextRequest) {
     const response = calculateMoodScore(responses);
     const { moodScore, mood } = response;
 
+    // Convert current date to "dd-mm-yyyy" format
+    const today = new Date();
+    const formattedDate = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getFullYear()}`;
+
+
     // Save the assessment to the database
     const newAssessment = new AssessmentModel({
       userID,
       responses,
       moodScore,
       mood,
+      date: formattedDate
     });
 
     await newAssessment.save();
