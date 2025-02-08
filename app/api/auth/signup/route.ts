@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
       gender
     } = await request.json();
 
+    console.log("data", username, email, password, age, gender);
+
+
     // Validate required fields
     if (!username || !email || !password) {
       return NextResponse.json(
@@ -50,6 +53,11 @@ export async function POST(request: NextRequest) {
     //   if (uploadedImageUrl) profilePictureUrl = uploadedImageUrl;
     // }
 
+    const date = new Date();
+    const formattedDate = dayjs(date).format('YYYY-MM-DD');
+
+    console.log("Date: ",formattedDate);
+
 
     // Create a new user
     const newUser = new UserModel({
@@ -60,11 +68,13 @@ export async function POST(request: NextRequest) {
       age,
       gender,
       profilePicture: "",
-      loginHistory: []
+      loginHistory: [formattedDate],
     });
 
     await newUser.save();
     const userId = newUser._id as unknown as string;
+
+    console.log("New User: ",newUser);
 
     // Generate a JWT token
     const token = generateJwtToken(userId);
