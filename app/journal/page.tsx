@@ -118,14 +118,17 @@ const JournalPage = () => {
 
     const handlePredictMood = async () => {
         setIsOpen(true);
+        console.log("Content for journal analysis: ", form.getValues("content"));
         try {
             const res = await axios.post('/api/journal/analyze-content', {
                 content: form.getValues("content")
             });
+
+            console.log("Journal Response: ", res);
             
-            if (res.status === 200) {
-                setMoodScore(res?.data.content.sentiment_score);
-            }
+            // if (res.status === 200) {
+            //     setMoodScore(res?.data.content.sentiment_score);
+            // }
         } catch (error) {
             console.error("Journal analysis error: ", error);
             toast({
