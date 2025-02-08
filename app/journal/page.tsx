@@ -54,7 +54,7 @@ const JournalPage = () => {
 
                 console.log("Journal Response: ", res);
 
-                if (res.status === 200 && res.data.content) {
+                if (res.status === 200 && res.data && typeof res.data.content === "string") {
                     form.setValue("content", res.data.content);
                 } else {
                     form.setValue("content", "");
@@ -85,7 +85,8 @@ const JournalPage = () => {
                 content: formData.content.trim(),
             };
 
-            if (!data.content) {
+            const content = form.getValues("content").trim();
+            if (!content) {
                 toast({
                     title: "Warning",
                     description: "Journal content cannot be empty.",
@@ -119,13 +120,18 @@ const JournalPage = () => {
     const handlePredictMood = async () => {
         setIsOpen(true);
         try {
-            const res = await axios.post('/api/journal/analyze-content', { content : form.getValues("content")});
+            const content = form.getValues("content").trim();
+            const res = await axios.post('/api/journal/analyze-content', { content }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
 
             console.log('Mood Analysis Response: ',res.data);
             
             
             if (res.status === 200) {
-                setMoodScore(res?.data.content.sentiment_score);
+                setMoodScore(res?.data?.sentiment_score ?? 0);
             }
         } catch (error) {
             console.error("Journal analysis error: ", error);
