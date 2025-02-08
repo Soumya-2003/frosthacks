@@ -65,7 +65,7 @@ const DashboardPage = () => {
                     <h2
                         className={cn("text-xl md:text3xl lg:text-4xl text-black font-extrabold", rubik.className)}
                     >
-                        {getGreeting()} {user?.username}
+                        {getGreeting()} {user?.name?.split(" ")[0]}
                     </h2>
                     <p
                         className="mt-3 text-base md:text-lg text-slate-800 font-semibold"
