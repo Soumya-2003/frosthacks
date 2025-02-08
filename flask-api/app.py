@@ -109,7 +109,8 @@ def analyze_sentence():
         return jsonify(sentiment_results), 200
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error in Flask API: {e}")  # Log exact error
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/analyze-weekly-data', methods=['POST'])
 def analyze_weekly_data():
