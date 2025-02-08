@@ -22,6 +22,7 @@ client = tweepy.Client(bearer_token=BEARER_TOKEN)
 
 @app.route('/')
 def home():
+    
     return "Welcome to the Sentiment Analysis API! Use the /analyze endpoint to analyze journal entries."
 
 @app.route('/twitter-sentiment', methods=['POST'])
@@ -52,23 +53,23 @@ def twitter_sentiment_analysis():
 
 @app.route('/analyze-content', methods=['POST'])
 def analyze_content():
-    
     try:
-        # Parse the input JSON
+        # Validate JSON request
         data = request.get_json()
-        if not data or 'content' not in data:
+        content = data.get('content') if isinstance(data, dict) else None
+
+        print("MYYYYYYYY Content: ",content)
+
+        if not content:
             return jsonify({'error': 'Invalid input. Expected JSON with "content" field.'}), 400
 
-        # Extract the journal content
-        journal_contents = [data['content']]
-
-        # Perform sentiment analysis
-        sentiment_results = analyze_sentiment(journal_contents)
-
-        # Return the results
+        #Perform sentiment analysis (Uncomment when function is available)
+        sentiment_results = analyze_sentiment([content])
         return jsonify(sentiment_results), 200
+
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error in Flask API: {e}")  # Log exact error
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/analyze-weekly-data', methods=['POST'])
 def analyze_weekly_data():
@@ -95,5 +96,5 @@ def analyze_weekly_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-if __name__ == '__main__':
+if __name__== '__main__':
     app.run(host='0.0.0.0', port=5000)  # Run the Flask app on localhost:5000
