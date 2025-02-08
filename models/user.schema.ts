@@ -9,10 +9,10 @@ export interface User extends Document {
     age?: number,
     gender?: 'male' | 'female' | 'other',
     profilePicture?: string,
-    verificationToken: string,
     passwordResetToken?: string,
     passwordResetExpiryTime?: Date,
-    oAuth?: boolean
+    oAuth?: boolean,
+    loginHistory: { date: string }[]
 }
 
 const userSchema: Schema<User> = new Schema({
@@ -22,11 +22,15 @@ const userSchema: Schema<User> = new Schema({
     role: { type: String, enum: ["user", "admin"], default: "user" },
     age: { type: Number, min: 13 }, // Assuming a minimum age requirement
     gender: { type: String, enum: ["male", "female", "other"] },
-    verificationToken: { type: String }, // Token for email verification
     passwordResetToken: { type: String },
     passwordResetExpiryTime: { type: Date },
     profilePicture: { type: String, default: "" },
-    oAuth: { type: Boolean, default: false }
+    oAuth: { type: Boolean, default: false },
+    loginHistory: [
+        {
+            date: { type: String, required: true }, // Store date as YYYY-MM-DD
+        }
+    ]
 },
     { timestamps: true }
 )
