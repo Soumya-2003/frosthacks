@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
-import JournalModel from '@/models/journal.schema';
-import SentimentModel from '@/models/sentiment.schema';
-import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
 import UserModel from '@/models/user.schema';
@@ -11,40 +8,37 @@ export async function POST(request: NextRequest) {
   await dbConnect();
 
   try {
+    // Ensure user is authenticated
     const session = await getServerSession();
-
-    if(!session){
+    if (!session) {
       return NextResponse.json(
-        {
-          message: "Unauthorized Request.",
-        },
-        {
-          status: 401
-        }
-      )
+        { message: "Unauthorized Request." },
+        { status: 401 }
+      );
     }
 
-    const existingUser = await UserModel.findOne({
-      email: session.user.email
-    })
-
-    if(!existingUser){
+    // Check if the user exists in the database
+    const existingUser = await UserModel.findOne({ email: session.user.email });
+    if (!existingUser) {
       return NextResponse.json(
-        {
-          message: "User not found."
-        },
-        {
-          status: 404
-        }
-      )
+        { message: "User not found." },
+        { status: 404 }
+      );
     }
 
-    const userID = existingUser._id;
+    // Extract journal content from the request body
+    const body = await request.json();
+    if (!body || !body.content || body.content.trim() === "") {
+      return NextResponse.json(
+        { message: "Invalid journal entry. Content cannot be empty." },
+        { status: 400 }
+      );
+    }
 
-    const { content } = await request.json();
+    const content = body.content.trim();
+    console.log("Received journal content for analysis:", content);
 
-    console.log("recieveing content", content);
-    // Call the Flask API for sentiment analysis
+    // Call the Flask API for mood analysis
     const flaskApiUrl = 'http://localhost:5000/analyze-content';
     let emotionResults;
     try {
@@ -56,16 +50,15 @@ export async function POST(request: NextRequest) {
       console.log("Flask error inside content analysis: ", error);
     }
 
-    // Add logic to save the result the sentiment analysis results to the database
-
+    // Return the analyzed mood/emotion to the user
     return NextResponse.json(
-      {...emotionResults},
+      { mood: emotionResults.mood, details: emotionResults },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Sentiment analysis error:', error);
+    console.error('Error analyzing journal mood:', error);
     return NextResponse.json(
-      { message: 'An error occurred during emotion analysis' },
+      { message: 'An error occurred during mood analysis.' },
       { status: 500 }
     );
   }

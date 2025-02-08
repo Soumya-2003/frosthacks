@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Parse the input JSON
     const responses = await request.json();
 
-    console.log("Data from frontend: ",responses);
+    console.log("Data from frontend: ", responses);
 
     // Validate responses
     if (!Array.isArray(responses) || responses.length !== 7 || !responses.every(r => r >= 1 && r <= 7)) {
@@ -41,15 +41,35 @@ export async function POST(request: NextRequest) {
     const response = calculateMoodScore(responses);
     const { moodScore, mood } = response;
 
-    // Save the assessment to the database
-    const newAssessment = new AssessmentModel({
+    // Convert current date to "dd-mm-yyyy" format
+    const today = new Date();
+    const formattedDate = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getFullYear()}`;
+
+    const existingAssessment = await AssessmentModel.findOne({
       userID,
-      responses,
-      moodScore,
-      mood,
+      date: formattedDate,
     });
 
-    await newAssessment.save();
+    if (existingAssessment) {
+      // Update the existing assessment
+      existingAssessment.responses = responses;
+      existingAssessment.moodScore = moodScore;
+      existingAssessment.mood = mood;
+      await existingAssessment.save();
+    }
+    else {
+      // Save the assessment to the database
+      const newAssessment = new AssessmentModel({
+        userID,
+        responses,
+        moodScore,
+        mood,
+        date: formattedDate
+      });
+
+      await newAssessment.save();
+
+    }
 
     // Return the results
     return NextResponse.json(

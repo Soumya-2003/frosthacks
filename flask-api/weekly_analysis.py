@@ -19,10 +19,12 @@ emotion_labels = [
 
 # Map detailed emotions to core categories
 emotion_mapping = {
-    "joy": "happy", "amusement": "happy", "excitement": "happy", "love": "happy", "optimism": "happy",
-    "sadness": "sad", "grief": "sad", "disappointment": "sad",
-    "fear": "anxious", "nervousness": "anxious",
-    "anger": "depressed", "remorse": "depressed", "disapproval": "depressed", "neutral": "happy"
+   "joy": "happy", "amusement": "happy", "excitement": "happy", "love": "happy", "optimism": "happy",
+    "admiration": "happy", "approval": "happy", "gratitude": "happy", "pride": "happy",
+    "sadness": "sad", "grief": "sad", "disappointment": "sad", "embarrassment": "sad",
+    "remorse": "sad", "desire": "sad", "disgust": "sad",
+    "fear": "anxious", "neutral": "anxious", "surprise": "anxious", "confusion": "anxious", "curiosity": "anxious",
+    "anger": "depressed", "annoyance": "depressed", "disapproval": "depressed", "realization": "sad"
 }
 
 def weekly_sentiment_analysis(journal_entries):
