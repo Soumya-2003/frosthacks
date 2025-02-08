@@ -15,11 +15,11 @@ app = Flask(__name__)
 
 
 # Twitter API v2 credentials
-API_KEY = os.getenv("API_KEY")
-API_SECRET = os.getenv("API_SECRET")
+API_KEY = os.getenv("NEXT_PUBLIC_TWEEPY_API_KEY")
+API_SECRET = os.getenv("NEXT_PUBLIC_TWEEPY_API_SECRET")
 BEARER_TOKEN = os.getenv("BEARER_TOKEN")
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.getenv("NEXT_PUBLIC_GOOGLE_API_KEY")
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
 # Tweepy client for v2 API
