@@ -4,6 +4,7 @@ import JournalModel from '@/models/journal.schema';
 import { getServerSession } from 'next-auth';
 import UserModel from '@/models/user.schema';
 import { authOptions } from '../../auth/[...nextauth]/options';
+import mongoose from 'mongoose';
 
 // New GET endpoint to view journal content for a specific date
 export async function GET(request: NextRequest) {
@@ -19,6 +20,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log("Session User: ", session.user);
+
     // Extract query parameters
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
@@ -28,6 +31,17 @@ export async function GET(request: NextRequest) {
         { message: 'Date is required' },
         { status: 400 }
       );
+    }
+
+    const existingUser = await UserModel.findOne({
+      email: session.user.email,
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { message: 'User not found' },
+        { status: 404 }
+      );    
     }
 
     // Convert input date to "DD-MM-YYYY"
@@ -41,9 +55,13 @@ export async function GET(request: NextRequest) {
 
     const formattedDate = `${gotDate.getDate().toString().padStart(2, '0')}-${(gotDate.getMonth() + 1).toString().padStart(2, '0')}-${gotDate.getFullYear()}`;
 
+    console.log("Formatted Date: ", formattedDate);
+
+    console.log("Session user Id: ", existingUser._id);
+
     // Find the journal entry for the specified user and date
     const journalEntry = await JournalModel.findOne({
-      userID: session.user._id,
+      userID: existingUser._id,
       date: formattedDate,
     });
 
