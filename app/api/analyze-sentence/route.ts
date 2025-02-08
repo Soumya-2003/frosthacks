@@ -1,3 +1,4 @@
+import { mood } from '@/assets/assets';
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import axios from "axios";
@@ -42,29 +43,51 @@ export async function POST(request: NextRequest) {
     // Process each sentence for analysis
     const analyzedResponses = await Promise.all(
       responses.map(async (entry) => {
-        const { promptWords, userResponse } = entry;
+        try {
+          const { promptWords, userResponse } = entry;
 
-        // Call the Flask API for sentiment analysis
-        const flaskApiUrl = "http://localhost:5000/analyze-content";
-        const response = await axios.post(flaskApiUrl, { content: userResponse });
-        const { overall_mood } = response.data;
+          console.log("Prompt Words:", promptWords);
+          console.log("User Response:", userResponse);
 
-        // Store in MongoDB
-        const newSentenceAnalysis = new SentenceAnalysisModel({
-          userID,
-          word: promptWords,
-          sentence: userResponse,
-          mood: overall_mood,
-          date: new Date(date),
-        });
+          // Call the Flask API for sentiment analysis
+          const flaskApiUrl = "http://localhost:5000/analyze-sentence";
+          const response = await axios.post(flaskApiUrl, { sentence: userResponse, word: promptWords });
+          console.log("Flask API Response:", response.data);
+          const { overall_mood, word, content } = response.data;
 
-        await newSentenceAnalysis.save();
+          if (!overall_mood || !word || !content) {
+            return NextResponse.json({ message: "An error occurred during emotion analysis" }, { status: 500 });
+          }
 
-        return {
-          word: promptWords,
-          sentence: userResponse,
-          mood: overall_mood,
-        };
+          console.log("Overall Mood:", overall_mood);
+          console.log("Word:", word);
+          console.log("Content:", content);
+
+          // Store in MongoDB
+          const newSentenceAnalysis = new SentenceAnalysisModel({
+            userID,
+            word: promptWords,
+            sentence: userResponse,
+            mood: overall_mood,
+            date: new Date(date),
+          });
+
+          if (!newSentenceAnalysis) {
+            return NextResponse.json({ message: "An error occurred during emotion analysis model creation." }, { status: 400 });
+          }
+
+          await newSentenceAnalysis.save();
+
+          return {
+            word: promptWords,
+            sentence: userResponse,
+            mood: overall_mood,
+            date: new Date(date),
+          };
+        } catch (error) {
+          return NextResponse.json({ message: "An error occurred during emotion analysis" }, { status: 500 });
+        }
+
       })
     );
 
