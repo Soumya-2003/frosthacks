@@ -6,6 +6,8 @@ from weekly_analysis import weekly_sentiment_analysis
 from social_media_analyzer import twitter_analyzer
 import os
 from dotenv import load_dotenv
+from report.emotion_analysis import generate_weekly_report
+import requests
 
 load_dotenv()
 
@@ -16,6 +18,9 @@ app = Flask(__name__)
 API_KEY = os.getenv("API_KEY")
 API_SECRET = os.getenv("API_SECRET")
 BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
 # Tweepy client for v2 API
 client = tweepy.Client(bearer_token=BEARER_TOKEN)
@@ -130,6 +135,36 @@ def analyze_weekly_data():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route("/chatbot", methods=["POST"])
+def chatbot():
+    try:
+        # Get user input from request JSON
+        data = request.get_json()
+        user_message = data.get("message", "")
+
+        # Prepend context
+        prompt = f"Respond like a mental health chatbot in 1 or 2 sentences. User is saying this: {user_message}"
+
+        # Prepare API request payload
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }]
+        }
+
+        # Send request to Gemini API
+        response = requests.post(GEMINI_URL, json=payload, headers={"Content-Type": "application/json"})
+        response_data = response.json()
+
+        # Extract bot response
+        bot_response = response_data.get("candidates", [{}])[0].get("content", "I'm here to help. Please tell me more.")
+
+        return jsonify({"response": bot_response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)  # Run the Flask app on localhost:5000

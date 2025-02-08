@@ -96,8 +96,8 @@ def generate_weekly_report(journal_entries, weekly_assessment):
                 "index": index
             })
             index += 0.1
-        # Sort traits by label to ensure consistent order
-        traits.sort(key=lambda x: x['label'])
+        # Sort traits by index to ensure consistent order
+        traits.sort(key=lambda x: x['index'])
         weekly_report["data"].append({"day": day, "traits": traits})
 
     # Optionally, add overall assessment data to the report
