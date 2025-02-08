@@ -13,6 +13,7 @@ import { poppins, rubik } from "@/helpers/fonts";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/loadingSpinner";
 
 const getRandomQuestions = (questions: string[], count: number) => {
     const shuffled = [...questions].sort(() => 0.5 - Math.random());
@@ -24,6 +25,7 @@ const Questionaire = () => {
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
     const [responses, setResponses] = useState<number[]>([]);
     const [isQuizComplete, setIsQuizComplete] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [responseHistory, setResponseHistory] = useState<{ [key: string]: number[][] }>({});
     const { toast } = useToast();
 
@@ -59,17 +61,20 @@ const Questionaire = () => {
         }));
 
         try {
+            setIsSubmitting(true);
             const res = await axios.post("/api/assessments",responses);
 
             console.log("MCQ Response: ", res.data);
 
             if(res.status === 200){
+                setIsSubmitting(false);
                 toast({
                     title: "Hurray!!",
                     description: "Quiz submitted successfully!!"
                 })
             }
         } catch (error) {
+            setIsSubmitting(false);
             console.log("MCQ Error: ",error);
             toast({
                 title: "Oops!!",
@@ -123,7 +128,7 @@ const Questionaire = () => {
                 <div className="flex justify-between mt-6 space-x-4">
                     <Button
                         onClick={handlePrev}
-                        disabled={currentIndex === 0}
+                        disabled={currentIndex === 0 || isSubmitting}
                         className="w-1/2 md:w-auto"
                     >
                         <ArrowLeft />
@@ -141,11 +146,14 @@ const Questionaire = () => {
                             onClick={handleSubmit}
                             variant={'outline'}
                             className="w-1/2 md:w-auto"
+                            disabled={isSubmitting || isQuizComplete}
                         >
                             Submit
                         </Button>
                     )}
                 </div>
+
+                {isSubmitting && !isQuizComplete ? <LoadingSpinner /> : null}
 
                 {isQuizComplete && (
                     <div className="mt-6 text-center">
