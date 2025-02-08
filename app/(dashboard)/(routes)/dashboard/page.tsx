@@ -1,7 +1,5 @@
 'use client'
 
-
-import { MoodHistoryChart } from "@/components/moodHistory";
 import { journal, mood, notepad3, report, social } from "@/assets/assets";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { APP_NAME, getRandomElement, motivationalQuotes, Routes } from "@/helpers/constants";
@@ -169,11 +167,6 @@ const DashboardPage = () => {
                         />
                     </WobbleCard>
                 </Link>
-            </div>
-            <div
-                className="w-full flex justify-center items-center"
-            >
-                <MoodHistoryChart />
             </div>
         </div>
     );

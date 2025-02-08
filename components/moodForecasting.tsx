@@ -28,7 +28,7 @@ const moodData = {
     ],
 };
 
-export const MoodHistoryChart = () => {
+export const MoodForecastingChart = () => {
     const [timeRange, setTimeRange] = useState<"weekly" | "monthly">("weekly");
 
     return (
@@ -43,7 +43,7 @@ export const MoodHistoryChart = () => {
             >
                 <CardHeader className="flex flex-col sm:flex-row items-center justify-between gap-2">
                     <CardTitle className="text-xl md:text-2xl font-bold text-center sm:text-left">
-                        Mood History
+                        Mood Forecasting
                     </CardTitle>
                     <Badge className="bg-white text-black dark:bg-white dark:text-black font-semibold px-3 py-2 hover:bg-white dark:hover:bg-gray-800 border border-black dark:border-white">
                         Current Mood: 😊
