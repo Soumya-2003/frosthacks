@@ -39,7 +39,8 @@ enum Routes {
     Journal = "/journal",
     Report = "/reports",
     MoodForcasting = "/mood-forecasting",
-    Entertainment = "/entertainment"
+    Entertainment = "/entertainment",
+    Documentation= "/documentation"
 }
 
 enum AssessmentOptions {

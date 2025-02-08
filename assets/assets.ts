@@ -6,6 +6,7 @@ import mood from './mood.png'
 import report from './report.png';
 import social from './social.png';
 import entertainment from './entertainment.png';
+import documentation from './documentation.png';
 
 export {
     notepadSvg,
@@ -15,5 +16,6 @@ export {
     mood,
     report,
     social,
-    entertainment
+    entertainment,
+    documentation
 }
