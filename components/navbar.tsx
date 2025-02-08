@@ -7,6 +7,8 @@ import { Poppins } from "next/font/google";
 import { DarkModeToggle } from "./darkModeToggler";
 import { useSession } from "next-auth/react";
 import { UserAvatar } from "./userAvatar";
+import { MessageCircle } from "lucide-react";
+import ChatbotPage from "./chatbotTool";
 
 const poppins = Poppins({
     weight: "600",
@@ -73,6 +75,8 @@ export const Navbar = ({ className }: { className?: string }) => {
                 </MenuItem>
 
                 <UserAvatar profilePicture={session?.user?.image|| ""}/>
+
+                <ChatbotPage />
 
                 
                 <DarkModeToggle />
