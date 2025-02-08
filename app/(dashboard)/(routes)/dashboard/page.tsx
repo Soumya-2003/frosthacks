@@ -11,13 +11,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 
 
 const DashboardPage = () => {
 
+    const [weeklyLogins, setWeeklyLogins] = useState<number | null>(null);
     const { data: session } = useSession();
+
 
     const user = session?.user
 
@@ -39,7 +41,17 @@ const DashboardPage = () => {
             }
         };
 
+        const fetchWeeklyLogins = async () => {
+            try {
+                const response = await axios.get("/api/weekly-login",{});
+                console.log("Weekly login count: ",response);
+            } catch (err) {
+                console.error("Error fetching weekly logins:", err);
+            }
+        }
+
         recordLogin();
+        fetchWeeklyLogins();
     }, []);
 
     return (
