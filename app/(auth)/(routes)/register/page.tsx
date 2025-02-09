@@ -139,6 +139,14 @@ const RegisterForm = () => {
                                                     >
                                                         {confirmPasswordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
                                                     </button>
+                                                    <div
+                                                        className="flex justify-center items-center text-sm mt-2"
+                                                    >
+                                                        <p>
+                                                            Already have an account?{" "}
+                                                            <span className="text-blue-500 hover:underline cursor-pointer" onClick={() => router.push('/login')}>Login</span>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <FormMessage />
                                             </FormItem>
