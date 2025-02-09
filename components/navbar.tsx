@@ -70,6 +70,7 @@ export const Navbar = ({ className }: { className?: string }) => {
                 <MenuItem setActive={setActive} active={active} item="Support">
                     <div className="flex flex-col space-y-4 text-sm">
                         <HoveredLink href="/help">FAQs</HoveredLink>
+                        <HoveredLink href="/feedback">Feedback</HoveredLink>
                         <HoveredLink href="/contact">Contact Support</HoveredLink>
                     </div>
                 </MenuItem>
