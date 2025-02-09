@@ -127,9 +127,9 @@ const JournalPage = () => {
 
             console.log("Journal Response: ", res);
             
-            // if (res.status === 200) {
-            //     setMoodScore(res?.data.content.sentiment_score);
-            // }
+            if (res.status === 200) {
+                setMoodScore(res?.data.details.content.sentiment_score);
+            }
         } catch (error) {
             console.error("Journal analysis error: ", error);
             toast({

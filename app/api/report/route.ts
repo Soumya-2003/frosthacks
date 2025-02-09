@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
 import UserModel from '@/models/user.schema';
+import { report } from 'process';
 
 export async function POST(request: NextRequest) {
   await dbConnect();
@@ -72,6 +73,8 @@ export async function POST(request: NextRequest) {
     const flaskApiUrl = 'http://localhost:5000/weekly-report';
     const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries, weekly_assessment: weekly_assessment });
     const reportResponse = response.data;
+
+    console.log(reportResponse)
 
     // TODO: Save result
 

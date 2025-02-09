@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import json
 import tweepy
+from journal import content_analysis
 from sentiment_analysis import analyze_sentiment
 from weekly_analysis import weekly_sentiment_analysis
 from social_media_analyzer import twitter_analyzer
@@ -67,13 +68,14 @@ def analyze_content():
         data = request.get_json()
         content = data.get('content') if isinstance(data, dict) else None
 
-        print("MYYYYYYYY Content: ",content)
+        print("MYYYYYYYY Content: ", content)
 
         if not content:
             return jsonify({'error': 'Invalid input. Expected JSON with "content" field.'}), 400
 
         #Perform sentiment analysis (Uncomment when function is available)
-        sentiment_results = analyze_sentiment([content])
+        sentiment_results = content_analysis.analyze_sentiment([content])
+
         return jsonify(sentiment_results), 200
 
     except Exception as e:
@@ -136,6 +138,22 @@ def analyze_weekly_data():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/weekly-report', methods=['POST'])
+def weekly_report():
+    try:
+        data = request.get_json()
+        print(data)
+        journal_entries = data.get('journal_entries', {})
+        weekly_assessment = data.get('weekly_assessment', {})
+
+        if not journal_entries:
+            return jsonify({"success": False, "message": "No journal entries provided"}), 400
+        report = generate_weekly_report(journal_entries, weekly_assessment)
+        return jsonify(report)
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"success": False, "message": "An error occurred while processing the request"}), 500
 
 
 @app.route("/chatbot", methods=["POST"])
