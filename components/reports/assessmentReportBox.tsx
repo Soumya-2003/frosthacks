@@ -3,6 +3,7 @@ import axios from 'axios';
 import { WobbleCard } from '../ui/wobble-card';
 import { poppins } from '@/helpers/fonts';
 import { cn } from '@/lib/utils';
+import { getSentimentStatement } from '@/helpers/giveSentiment';
 
 interface Assessment {
     userID: string;
@@ -40,33 +41,44 @@ export const AssessmentReportBox = ({ currentDate }: AssessmentReportBoxProps) =
     }, []);
 
     if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
 
     return (
 
         <div>
             <h1 className='text-lg text-center mb-3 mt-8'>Weekly Assessement Analysis</h1>
             <div className="grid grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
-            {assessments.length > 0 ? (
-                assessments.map((assessment) => (
-                    <WobbleCard key={assessment.date.toString()} containerClassName="col-span-1 bg-yellow-600">
-                        <p
-                            className={cn(
-                                "text-md md:text-sm lg:text-lg font-extrabold",
-                                poppins.className
-                            )}
-                        >
-                            Date: {new Date(assessment.date).toLocaleDateString()}
-                        </p>
-                        <p className="text-lg font-bold">Date: {new Date(assessment.date).toLocaleDateString()}</p>
-                        <p className="text-md">Mood: {assessment.mood}</p>
-                        <p className="text-md">Mood Score: {assessment.moodScore.toFixed(2)}</p>
-                    </WobbleCard>
-                ))
-            ) : (
-                <p>No assessments available for the last 7 days.</p>
-            )}
-        </div>
+                {assessments.length > 0 ? (
+                    assessments.map((assessment) => {
+                        const sentiment = getSentimentStatement(assessment.moodScore / 100);
+                        const statement = sentiment?.statements[Math.floor(Math.random() * sentiment.statements.length)];
+
+                        return (<WobbleCard key={assessment.date.toString()} containerClassName="col-span-1 bg-yellow-600">
+                            <p
+                                className={cn(
+                                    "text-md md:text-sm lg:text-lg font-extrabold",
+                                    poppins.className
+                                )}
+                            >
+                                {new Date(assessment.date).toLocaleDateString('en-IN', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                })}
+                            </p>
+                            <p className="text-md">Mood: {assessment.mood}</p>
+                            <p className="text-md">Mood Score: {assessment.moodScore.toFixed(2)}</p>
+
+                            <div className="rounded-xl overflow-x p-3">
+                                <small className="break-all"><b>Suggestion</b> - <br />{statement}</small>
+                                <br />
+                            </div>
+
+                        </WobbleCard>)
+                    })
+                ) : (
+                    <p>No assessments available for the last 7 days.</p>
+                )}
+            </div>
         </div>
     );
 };
