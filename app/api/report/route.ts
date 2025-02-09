@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries, weekly_assessment: weekly_assessment });
     const reportResponse = response.data;
 
-    console.log(reportResponse)
+    console.log("Report: ",reportResponse)
 
     // TODO: Save result
 
