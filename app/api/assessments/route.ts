@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         responses,
         moodScore,
         mood,
-        date: formattedDate
+        date: today
       });
 
       await newAssessment.save();
