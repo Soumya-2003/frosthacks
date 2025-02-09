@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
         const assessments = await AssessmentModel.find({
             userID,
-            date: { $gte: formattedDate },
+            date: { $gte: sevenDaysAgo },
         }).sort({ date: 1 });
 
         if (!assessments || assessments.length === 0) {

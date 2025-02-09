@@ -63,6 +63,7 @@ const ReportPage: React.FC = () => {
             }
         } catch (error) {
             console.log("Journal analysis error: ", error);
+            setLoading(false);
         }
     }
 
