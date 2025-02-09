@@ -9,12 +9,10 @@ import os
 from dotenv import load_dotenv
 from report.emotion_analysis import generate_weekly_report
 import requests
-from flask_cors import CORS
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
 
 # Twitter API v2 credentials
 API_KEY = os.getenv("NEXT_PUBLIC_TWEEPY_API_KEY")
