@@ -17,6 +17,7 @@ import { THANKS_MESSAGE } from "@/helpers/constants";
 import { poppins } from "@/helpers/fonts";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import ComingSoonPage from "@/components/comingSoon";
 
 const ImagePerception = () => {
     const [currentImage, setCurrentImage] = useState<number>(0);
@@ -69,6 +70,8 @@ const ImagePerception = () => {
 
         handleNextImage();
     };
+
+    return(<ComingSoonPage />);
 
     return (
         <motion.div

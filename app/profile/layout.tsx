@@ -6,7 +6,7 @@ import { ThemeProvider } from "next-themes";
 
 
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <SessionProvider>
             <ThemeProvider
@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {/* Add sidebar for small screens */}
                     <Navbar />
                     <div
-                        className="mt-44"
+                        className="mt-36"
                     >
                         {children}
                     </div>
@@ -30,4 +30,4 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     );
 }
 
-export default DashboardLayout;
+export default ProfileLayout;
