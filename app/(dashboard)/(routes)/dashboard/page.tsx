@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 const DashboardPage = () => {
 
     const [weeklyLogins, setWeeklyLogins] = useState<number | null>(null);
+    const [randomQuote, setRandomQuote] = useState<string | null>(null);
     const { data: session } = useSession();
 
 
@@ -48,13 +49,15 @@ const DashboardPage = () => {
             }
         }
 
+        setRandomQuote(getRandomElement(motivationalQuotes, motivationalQuotes.length));
+
         recordLogin();
         fetchWeeklyLogins();
     }, []);
 
     return (
         <div
-            className="space-y-8 flex flex-col items-center w-full max-w-7xl top-15"
+            className="space-y-8 flex flex-col items-center w-full max-w-7xl top-16"
         >
             <div
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full"
@@ -65,12 +68,12 @@ const DashboardPage = () => {
                     <h2
                         className={cn("text-xl md:text3xl lg:text-4xl text-black font-extrabold", rubik.className)}
                     >
-                        {getGreeting()} {user?.name?.split(" ")[0]}
+                        {getGreeting()} {user?.name?.split(" ")[0] || "Friend"}
                     </h2>
                     <p
                         className="mt-3 text-base md:text-lg text-slate-800 font-semibold"
                     >
-                        {getRandomElement(motivationalQuotes, motivationalQuotes.length)} {/* TODO: fix hydration error */}
+                        {randomQuote || "Welcome to your personal dashboard."}
                     </p>
                 </WobbleCard>
                 <Link href={Routes.Assessment} >
