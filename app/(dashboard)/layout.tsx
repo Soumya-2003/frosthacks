@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {/* Add sidebar for small screens */}
                     <Navbar />
                     <div
-                        className="mt-36"
+                        className="mt-44"
                     >
                         {children}
                     </div>
