@@ -39,7 +39,9 @@ export async function POST(request: NextRequest) {
     console.log("Received journal content for analysis:", content);
 
     // Call the Flask API for mood analysis
-    const flaskApiUrl = 'http://localhost:5000/analyze-content';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_FLASK_API_URL;
+
+    const flaskApiUrl = `${API_BASE_URL}/analyze-content`;
     let emotionResults;
     try {
       const response = await axios.post(flaskApiUrl, { content: content });
