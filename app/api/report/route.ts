@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Call the Flask API for sentiment analysis
-    const flaskApiUrl = 'http://localhost:5000/weekly-report';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_FLASK_API_URL;
+    const flaskApiUrl = `${API_BASE_URL}/weekly-report`;
     const response = await axios.post(flaskApiUrl, { journal_entries: journalEntries, weekly_assessment: weekly_assessment });
     const reportResponse = response.data;
 
