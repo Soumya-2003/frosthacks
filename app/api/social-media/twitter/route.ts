@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
 
     console.log("recieveing content", username);
     // Call the Flask API for sentiment analysis
-    const flaskApiUrl = 'http://localhost:5000/twitter-sentiment';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_FLASK_API_URL;
+    const flaskApiUrl = `${API_BASE_URL}/twitter-sentiment`;
     const response = await axios.post(flaskApiUrl, { username: username });
     const twitterResults = response.data;
 
