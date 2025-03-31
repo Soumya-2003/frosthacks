@@ -8,3 +8,4 @@ transformers
 tweepy
 Flask
 python-dotenv
+gunicorn
