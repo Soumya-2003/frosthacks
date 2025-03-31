@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 import tweepy
 from journal import content_analysis
@@ -13,6 +14,7 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 # Twitter API v2 credentials
 API_KEY = os.getenv("NEXT_PUBLIC_TWEEPY_API_KEY")
