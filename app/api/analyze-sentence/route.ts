@@ -7,6 +7,8 @@ import UserModel from "@/models/user.schema";
 import SentenceAnalysisModel from "@/models/sentenceAnalysis.schema";
 import mongoose from "mongoose";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_FLASK_API_URL;
+
 export async function POST(request: NextRequest) {
   await dbConnect();
 
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
           console.log("User Response:", userResponse);
 
           // Call the Flask API for sentiment analysis
-          const flaskApiUrl = "http://localhost:5000/analyze-sentence";
+          const flaskApiUrl = `${API_BASE_URL}/analyze-sentence`;
           const response = await axios.post(flaskApiUrl, { sentence: userResponse, word: promptWords });
           console.log("Flask API Response:", response.data);
           const { overall_mood, word, content } = response.data;
